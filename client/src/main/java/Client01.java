@@ -11,7 +11,7 @@ public class Client01 {
     public static void main(String[] args) {
         try (Socket socket = new Socket("localhost", 8001);
              FileInputStream fis = new FileInputStream("client/src/main/resources/client_send.txt");
-             FileOutputStream fos = new FileOutputStream("client/src/main/resources/client_recv.txt")) {
+             FileOutputStream fos = new FileOutputStream("client/out/client_recv.txt")) {
 
             int ch;
             // client_send.txtの内容をサーバに送信

@@ -14,7 +14,7 @@ public class Server01 {
     public static void main(String[] args) {
 
         try (ServerSocket server = new ServerSocket(8001);
-             FileOutputStream outputStream = new FileOutputStream("server/src/main/resources/server_recv.txt");
+             FileOutputStream outputStream = new FileOutputStream("server/out/server_recv.txt");
              FileInputStream inputStream = new FileInputStream("server/src/main/resources/server_send.txt")) {
             System.out.println("クライアントからの接続を待ちます。");
             Socket socket = server.accept();
