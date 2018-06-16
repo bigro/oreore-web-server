@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -31,14 +33,14 @@ public class ServerThread implements Runnable {
             while ((line = Util.readLine(input)) != null) {
                 if (line.isEmpty()) break;
                 if (line.startsWith("GET")) {
-                    requrestPath = line.split(" ")[1];
+                    requrestPath = URLDecoder.decode(line.split(" ")[1], "UTF-8");
                     String[] tmp = requrestPath.split("\\.");
                     ext = tmp[tmp.length - 1];
                 } else if (line.startsWith("Host:")) {
                     host = line.substring("Host: ".length());
                 }
             }
-            
+
             if (requrestPath == null) {
                 return;
             }
@@ -49,18 +51,30 @@ public class ServerThread implements Runnable {
             }
 
             OutputStream output = socket.getOutputStream();
+            Path path = Paths.get(DOCUMENT_ROOT + requrestPath);
+            Path realPath;
+
+            try {
+                realPath = path.toRealPath();
+            } catch (NoSuchFileException ex) {
+                SendResponse.sendNotFoundResponse(output, ERROR_DOCUMENT);
+                return;
+            }
+            if (!realPath.startsWith(Paths.get(DOCUMENT_ROOT).toRealPath().toString())) {
+                SendResponse.sendNotFoundResponse(output, ERROR_DOCUMENT);
+                return;
+            } else if (Files.isDirectory(realPath)) {
+                String location = "http://"
+                        + ((host != null) ? host : SERVER_NAME)
+                        + path + "/";
+                SendResponse.sendMovePermanentlyResponse(output, location);
+                return;
+            }
+
             try (FileInputStream inputStream = new FileInputStream(DOCUMENT_ROOT + requrestPath)) {
                 SendResponse.sendOkResponse(output, inputStream, ext);
             } catch (FileNotFoundException ex) {
-                Path path = Paths.get(DOCUMENT_ROOT + requrestPath);
-                if (Files.isDirectory(path)) {
-                    String location = "http://"
-                            + ((host != null) ? host : SERVER_NAME)
-                            + requrestPath + "/";
-                    SendResponse.sendMovePermanentlyResponse(output, location);
-                } else {
-                    SendResponse.sendNotFoundResponse(output, ERROR_DOCUMENT);
-                }
+                SendResponse.sendNotFoundResponse(output, ERROR_DOCUMENT);
             }
         } catch (Exception e) {
             e.printStackTrace();
