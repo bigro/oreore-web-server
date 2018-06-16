@@ -1,4 +1,5 @@
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 public class SendResponse {
@@ -37,5 +38,14 @@ public class SendResponse {
                 output.write(ch);
             }
         }
+    }
+
+    public static void sendMovePermanentlyResponse(OutputStream output, String location) throws IOException {
+        Util.writeLine(output, "HTTP/1.1 301 Moved Permanently");
+        Util.writeLine(output, "Date: " + Util.getDateStringUtc());
+        Util.writeLine(output, "Server: Server05.java");
+        Util.writeLine(output, "Location: " + location);
+        Util.writeLine(output, "Connection: close");
+        Util.writeLine(output, "");
     }
 }
