@@ -1,3 +1,5 @@
+package util;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,7 +23,7 @@ public class Util {
                 }
             };
 
-    static void writeLine(OutputStream output, String line) throws IOException {
+    public static void writeLine(OutputStream output, String line) throws IOException {
                 for (char c : line.toCharArray()) {
                     output.write((int) c);
                 }
@@ -29,7 +31,7 @@ public class Util {
                 output.write((int) '\n');
             }
 
-    static String readLine(InputStream input) throws IOException {
+    public static String readLine(InputStream input) throws IOException {
                 int ch;
                 String ret = "";
                 while ((ch = input.read()) != -1) {
@@ -48,12 +50,12 @@ public class Util {
                 }
             }
 
-    static String getDateStringUtc() {
+    public static String getDateStringUtc() {
                 ZonedDateTime time = ZonedDateTime.now(ZoneId.of("GMT"));
                 return time.format(DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss"));
             }
 
-    static String getContentType(String ext) {
+    public static String getContentType(String ext) {
         String contentType = contentTypeMap.get(ext.toLowerCase());
         if (contentType == null) {
             return "application/octet-stream";

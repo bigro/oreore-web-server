@@ -1,10 +1,21 @@
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+package util;
+
+import java.io.*;
 
 public class SendResponse {
 
-    static void sendOkResponse(OutputStream output, FileInputStream fis,
+    public static void sendOkResponseHeader(PrintWriter writer,
+                                            String contentType)
+            throws IOException {
+        writer.println("HTTP/1.1 200 OK");
+        writer.println("Date: " + Util.getDateStringUtc());
+        writer.println("Server: Henacat");
+        writer.println("Connection: close");
+        writer.println("Content-type: " + contentType);
+        writer.println("");
+    }
+
+    public static void sendOkResponse(OutputStream output, InputStream fis,
                                String ext) throws Exception {
         Util.writeLine(output, "HTTP/1.1 200 OK");
         Util.writeLine(output, "Date: " + Util.getDateStringUtc());
@@ -20,7 +31,7 @@ public class SendResponse {
         }
     }
 
-    static void sendNotFoundResponse(OutputStream output,
+    public static void sendNotFoundResponse(OutputStream output,
                                      String errorDocumentRoot)
             throws Exception {
 
