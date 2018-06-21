@@ -9,6 +9,8 @@ public class ServletManager {
     
     private static HashMap<String, HttpServlet> urlMapping = new HashMap<>();
     
+    // ここでServletのインスタンスを作ってしまうのは微妙かもしれない。
+    // 最初にとりあえず作成するより使うときに作成する方がコストが多少抑えられるような。
     public static void init() throws Exception {
         for (Map.Entry<String, String> entry : ServletConfig.urlMapping.entrySet()) {
             urlMapping.put(entry.getKey(), createServlet(entry.getValue()));
