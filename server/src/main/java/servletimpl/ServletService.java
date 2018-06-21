@@ -97,6 +97,7 @@ public class ServletService {
         // Servletのサービスを実行する。（doGet()やdoPost()）
         info.servlet.service(req, resp);
 
+        // Servletのサービス側でリダイレクトを設定しているとstatusがSC_FOUNDになっているので、リダイレクトしてない場合がこっち。
         if (resp.status == HttpServletResponse.SC_OK) {
             
             // レスポンスヘッダーを出力する。
@@ -109,13 +110,16 @@ public class ServletService {
             for (byte b: outputBytes) {
                 output.write((int)b);
             }
+        // リダイレクトの場合    
         } else if (resp.status == HttpServletResponse.SC_FOUND) {
             String redirectLocation;
+            // "/"始まりの場合はサーバ名を付与する。
             if (resp.redirectLocation.startsWith("/")) {
                 String host = requestHeader.get("HOST");
                 redirectLocation = "http://"
                         + ((host != null) ? host : Constants.SERVER_NAME)
                         + resp.redirectLocation;
+            // それ以外はそのままのパスにリダイレクト    
             } else {
                 redirectLocation = resp.redirectLocation;
             }

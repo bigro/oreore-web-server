@@ -87,15 +87,20 @@ public class ServerThread implements Runnable {
 
             output = new BufferedOutputStream(socket.getOutputStream());
 
+            // Servletのサービスを実行する。(doGetとかdoPost)
             ServletInfo servletInfo = ServletInfo.searchServlet(path);
             if (servletInfo != null) {
                 ServletService.doService(method, query, servletInfo, requestHeader, input, output);
                 return;
             }
+            
+            // ここからはServletに設定されてないパスがリクエストされた場合(htmlファイルなど)
 
+            // リクエストファイルの拡張子を取得する。
             String[] tmp = reqUri.split("\\.");
             String ext = tmp[tmp.length - 1];
 
+            // リクエストパスが"/"で終わっていた場合はindex.htmlを表示する。
             if (path.endsWith("/")) {
                 path += "index.html";
                 ext = "html";
@@ -105,13 +110,16 @@ public class ServerThread implements Runnable {
             Path realPath;
             try {
                 realPath = pathObj.toRealPath();
-            } catch (NoSuchFileException ex) {
+            } catch (NoSuchFileException ex) { // リクエストされたファイルが存在しない場合はエラーページを出力する
                 SendResponse.sendNotFoundResponse(output, ERROR_DOCUMENT);
                 return;
             }
+            
+            // "../"などの相対パスを指定された時（ディレクトリトラサーバル）の対策
             if (!realPath.startsWith(Paths.get(DOCUMENT_ROOT).toRealPath().toString())) {
                 SendResponse.sendNotFoundResponse(output, ERROR_DOCUMENT);
                 return;
+            // リクエストパスがディレクトリだった場合は末尾に"/"をつけたパスにリダイレクトする。    
             } else if (Files.isDirectory(realPath)) {
                 String host = requestHeader.get("HOST");
                 String location = "http://"

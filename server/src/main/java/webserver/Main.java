@@ -8,6 +8,7 @@ import java.net.Socket;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        // サーブレットの設定
         ServletInfo.addServlet("/bbs/TestBBS",
                 "/Users/ooguro/Documents/git/oreore-web-server/server/out/production/classes/bbs",
                 "bbs.TestBBS");
