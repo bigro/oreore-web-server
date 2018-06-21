@@ -9,4 +9,6 @@ public interface HttpServletResponse {
     void setCharacterEncoding(String charset);
 
     PrintWriter getWriter() throws IOException;
+
+    void addCookie(Cookie cookie);
 }

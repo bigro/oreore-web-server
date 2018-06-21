@@ -1,22 +1,23 @@
 package util;
 
+import servletinterfaces.ResponseHeaderGenerator;
+
 import java.io.*;
 
 public class SendResponse {
 
-    public static void sendOkResponseHeader(PrintWriter writer,
-                                            String contentType)
-            throws IOException {
-        writer.println("HTTP/1.1 200 OK");
-        writer.println("Date: " + Util.getDateStringUtc());
-        writer.println("Server: Henacat");
-        writer.println("Connection: close");
-        writer.println("Content-type: " + contentType);
-        writer.println("");
+    public static void sendOkResponseHeader(OutputStream output, String contentType, ResponseHeaderGenerator headerGenerator) throws IOException {
+        Util.writeLine(output, "HTTP/1.1 200 OK");
+        Util.writeLine(output, "Date: " + Util.getDateStringUtc());
+        Util.writeLine(output, "Server: Henacat");
+        Util.writeLine(output, "Connection: close");
+        Util.writeLine(output, "Content-type: " + contentType);
+        headerGenerator.generate(output);
+        Util.writeLine(output, "");
     }
 
     public static void sendOkResponse(OutputStream output, InputStream fis,
-                               String ext) throws Exception {
+                                      String ext) throws Exception {
         Util.writeLine(output, "HTTP/1.1 200 OK");
         Util.writeLine(output, "Date: " + Util.getDateStringUtc());
         Util.writeLine(output, "Server: Server04.java");
@@ -32,7 +33,7 @@ public class SendResponse {
     }
 
     public static void sendNotFoundResponse(OutputStream output,
-                                     String errorDocumentRoot)
+                                            String errorDocumentRoot)
             throws Exception {
 
         Util.writeLine(output, "HTTP/1.1 404 Not Found");

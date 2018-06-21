@@ -8,4 +8,6 @@ public interface HttpServletRequest {
     String getParameter(String name);
 
     void setCharacterEncoding(String env) throws UnsupportedEncodingException;
+
+    Cookie[] getCookies();
 }

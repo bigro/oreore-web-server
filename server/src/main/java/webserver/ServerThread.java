@@ -39,12 +39,28 @@ public class ServerThread implements Runnable {
             String requestLine = null;
             String method = null;
             Map<String, String> requestHeader = new HashMap<>();
+            
+            /*
+                以下の様なリクエスト情報を取得する。
+                GET /bbs/TestBBS HTTP/1.1
+                Host: localhost:8001
+                Connection: keep-alive
+                Cache-Control: max-age=0
+                Upgrade-Insecure-Requests: 1
+                User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36
+                Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,* / *;q=0.8
+                Accept-Encoding: gzip, deflate, br
+                Accept-Language: ja-JP,ja;q=0.9,en-US;q=0.8,en;q=0.7
+                Cookie: Idea-82e9b1cf=6fc9cf77-d596-48b4-8d35-cc124454ced6; searchVal=%7B%22fb261cf6-21d8-4ef1-9bae-1497251c498c%22%3A%22NAME%22%7D; _ga=GA1.1.985216103.1508769118; JSESSIONID=B255DB42914B5165CEF2FBD14D481CFD
+             */
             InputStream input = socket.getInputStream();
+
             while ((line = Util.readLine(input)) != null) {
                 if (line.isEmpty()) break;
+                // GETリクエストの場合は GET /bbs/TestBBS HTTP/1.1 の様な形で来るので"GET"始まりかで判断する。
                 if (line.startsWith("GET")) {
                     method = "GET";
-                    requestLine = line;
+                    requestLine = line; // "GET /bbs/TestBBS HTTP/1.1" みたいな文字列が入る
                 } else if (line.startsWith("POST")) {
                     method = "POST";
                     requestLine = line;
@@ -57,7 +73,11 @@ public class ServerThread implements Runnable {
                 return;
             }
 
+            // リクエストURLは"GET /bbs/TestBBS HTTP/1.1"の様に半角スペース区切りの2つ目に記載されているので、
+            // 取得してUTF-8でデコードする。
             String reqUri = URLDecoder.decode(requestLine.split(" ")[1], "UTF-8");
+            
+            // リクエストURLにクエリが含まれている場合は"?"の後に記載されているので区切って取得する。
             String[] pathAndQuery = reqUri.split("\\?");
             String path = pathAndQuery[0];
             String query = null;
@@ -69,8 +89,7 @@ public class ServerThread implements Runnable {
 
             ServletInfo servletInfo = ServletInfo.searchServlet(path);
             if (servletInfo != null) {
-                ServletService.doService(method, query, servletInfo,
-                        requestHeader, input, output);
+                ServletService.doService(method, query, servletInfo, requestHeader, input, output);
                 return;
             }
 
@@ -121,13 +140,28 @@ public class ServerThread implements Runnable {
         }
     }
 
+    /**
+     * 
+     * @param requestHeader
+     * @param line
+     * 
+     * GETでもPOSTでも始まらない以下の様なリクエスヘッダーを属性名と値に分けてMAPに格納する。
+     * <ul>
+     *     <li>Host: localhost:8001</li>
+     *     <li>Connection: keep-alive</li>
+     *     <li>Cache-Control: max-age=0</li>
+     * </ul>
+     */
     private static void addRequestHeader(Map<String, String> requestHeader, String line) {
-        int colonPos = line.indexOf(':');
-        if (colonPos == -1)
-            return;
-
-        String headerName = line.substring(0, colonPos).toUpperCase();
-        String headerValue = line.substring(colonPos + 1).trim();
+        int colonPosition = line.indexOf(':');
+        
+        // コロンが含まれない行はなんかおかしいので飛ばす。
+        if (colonPosition == -1) return;
+        
+        // コロンで名前と値が区切られてるのでsubstringする。
+        String headerName = line.substring(0, colonPosition).toUpperCase();
+        // コロンの後に半角スペース入ってるのでtrimする。
+        String headerValue = line.substring(colonPosition + 1).trim();
         requestHeader.put(headerName, headerValue);
     }
 

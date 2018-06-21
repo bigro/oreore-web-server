@@ -11,6 +11,15 @@ public abstract class HttpServlet {
             throws ServletException, java.io.IOException {
     }
 
+    /**
+     * 
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws java.io.IOException
+     * 
+     * リクエストを元にメソッドを呼び出す。
+     */
     public void service(HttpServletRequest req,
                         HttpServletResponse resp)
             throws ServletException, java.io.IOException {

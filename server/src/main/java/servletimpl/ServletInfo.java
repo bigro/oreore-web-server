@@ -24,6 +24,11 @@ public class ServletInfo {
         servletCollection.put(urlPattern, servletInfo);
     }
 
+    /**
+     * 
+     * @param urlPattern
+     * @return 引数で渡されたURLにマッピングされたServletInfo
+     */
     public static ServletInfo searchServlet(String urlPattern) {
         return servletCollection.get(urlPattern);
     }
