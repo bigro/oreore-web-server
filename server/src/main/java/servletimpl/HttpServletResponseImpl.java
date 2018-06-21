@@ -16,6 +16,8 @@ public class HttpServletResponseImpl implements HttpServletResponse {
     private OutputStream outputStream;
     PrintWriter printWriter;
     List<Cookie> cookies = new ArrayList<>();
+    int status;
+    String redirectLocation;
 
     @Override
     public void setContentType(String contentType) {
@@ -44,8 +46,20 @@ public class HttpServletResponseImpl implements HttpServletResponse {
     public void addCookie(Cookie cookie) {
         this.cookies.add(cookie);
     }
+    
+    @Override
+    public void sendRedirect(String location) {
+        this.redirectLocation = location;
+        setStatus(SC_FOUND);
+    }
+
+    @Override
+    public void setStatus(int sc) {
+        this.status = sc;
+    }
 
     HttpServletResponseImpl(OutputStream output) {
         this.outputStream = output;
+        this.status = SC_OK;
     }
 }

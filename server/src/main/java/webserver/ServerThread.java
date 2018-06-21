@@ -2,6 +2,7 @@ package webserver;
 
 import servletimpl.ServletInfo;
 import servletimpl.ServletService;
+import util.Constants;
 import util.SendResponse;
 import util.Util;
 
@@ -22,7 +23,6 @@ public class ServerThread implements Runnable {
 
     private static final String DOCUMENT_ROOT = "server/src/main/resources/web";
     private static final String ERROR_DOCUMENT = "server/src/main/resources";
-    private static final String SERVER_NAME = "localhost:8001";
 
     private Socket socket;
 
@@ -115,7 +115,7 @@ public class ServerThread implements Runnable {
             } else if (Files.isDirectory(realPath)) {
                 String host = requestHeader.get("HOST");
                 String location = "http://"
-                        + ((host != null) ? host : SERVER_NAME)
+                        + ((host != null) ? host : Constants.SERVER_NAME)
                         + path + "/";
                 SendResponse.sendMovePermanentlyResponse(output, location);
                 return;

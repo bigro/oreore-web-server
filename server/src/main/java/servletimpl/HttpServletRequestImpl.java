@@ -2,6 +2,7 @@ package servletimpl;
 
 import servletinterfaces.Cookie;
 import servletinterfaces.HttpServletRequest;
+import servletinterfaces.HttpSession;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -14,7 +15,10 @@ public class HttpServletRequestImpl implements HttpServletRequest {
     private Map<String, String> parameterMap;
     private Map<String, String> requestHeader;
     private Cookie[] cookies;
-    
+    private HttpSessionImpl session;
+    private HttpServletResponseImpl response;
+    private final String SESSION_COOKIE_ID = "JSESSIONID";
+
 
     @Override
     public String getMethod() {
@@ -65,14 +69,59 @@ public class HttpServletRequestImpl implements HttpServletRequest {
         return ret;
     }
 
+    @Override
+    public HttpSession getSession() {
+        return getSession(true);
+    }
+
+    @Override
+    public HttpSession getSession(boolean create) {
+        if (!create) {
+            return this.session;
+        }
+        if (this.session == null) {
+            SessionManager manager = SessionManager.getInstance();
+            this.session = manager.createSession();
+            addSessionCookie();
+        }
+        return this.session;
+    }
+
+    private HttpSessionImpl getSessionInternal() {
+        if (this.cookies == null) {
+            return null;
+        }
+        Cookie cookie = null;
+        for (Cookie tempCookie : this.cookies) {
+            if (tempCookie.getName().equals(SESSION_COOKIE_ID)) {
+                cookie = tempCookie;
+            }
+        }
+        SessionManager manager = SessionManager.getInstance();
+        HttpSessionImpl ret = null;
+        if (cookie != null) {
+            ret = manager.getSession(cookie.getValue());
+        }
+        return ret;
+    }
+
+    private void addSessionCookie() {
+        this.response.addCookie(new Cookie(SESSION_COOKIE_ID, this.session.getId() + "; HttpOnly"));
+    }
+
     HttpServletRequestImpl(String method, Map<String, String> requestHeader,
-                           Map<String, String> parameterMap) {
+                           Map<String, String> parameterMap,
+                           HttpServletResponseImpl resp) {
         this.method = method;
         this.requestHeader = requestHeader;
         this.cookies = parseCookies(requestHeader.get("COOKIE"));
         this.parameterMap = parameterMap;
+        this.response = resp;
+        this.session = getSessionInternal();
+        if (this.session != null) {
+            addSessionCookie();
+        }
     }
-
 
     HttpServletRequestImpl(String method, Map<String, String> parameterMap) {
         this.method = method;

@@ -60,4 +60,13 @@ public class SendResponse {
         Util.writeLine(output, "Connection: close");
         Util.writeLine(output, "");
     }
+
+    public static void sendFoundResponse(OutputStream output, String location) throws Exception {
+        Util.writeLine(output, "HTTP/1.1 302 Found");
+        Util.writeLine(output, "Date: " + Util.getDateStringUtc());
+        Util.writeLine(output, "Server: Henacat");
+        Util.writeLine(output, "Location: " + location);
+        Util.writeLine(output, "Connection: close");
+        Util.writeLine(output, "");
+    }
 }
