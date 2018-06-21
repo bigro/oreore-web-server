@@ -8,19 +8,16 @@ public class ServletInfo {
     private static HashMap<String, ServletInfo> servletCollection = new HashMap<>();
 
     private String urlPattern;
-    String servletDirectory;
     String servletClassName;
     HttpServlet servlet;
 
-    public ServletInfo(String urlPattern, String servletDirectory, String servletClassName) {
+    public ServletInfo(String urlPattern, String servletClassName) {
         this.urlPattern = urlPattern;
-        this.servletDirectory = servletDirectory;
         this.servletClassName = servletClassName;
     }
 
-    public static void addServlet(String urlPattern, String servletDirectory,
-                                  String servletClassName) {
-        ServletInfo servletInfo = new ServletInfo(urlPattern, servletDirectory, servletClassName);
+    public static void addServlet(String urlPattern, String servletClassName) {
+        ServletInfo servletInfo = new ServletInfo(urlPattern, servletClassName);
         servletCollection.put(urlPattern, servletInfo);
     }
 
