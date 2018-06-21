@@ -1,16 +1,13 @@
 package webserver;
 
-import servletimpl.ServletInfo;
-
-import java.io.IOException;
+import config.ServletManager;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        // サーブレットの設定
-        ServletInfo.addServlet("/bbs/TestBBS","bbs.TestBBS");
-
+    public static void main(String[] args) throws Exception {
+        ServletManager.init();
+        
         try (ServerSocket server = new ServerSocket(8001)) {
             for (; ; ) {
                 Socket socket = server.accept();

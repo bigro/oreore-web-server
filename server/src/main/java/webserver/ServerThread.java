@@ -1,6 +1,6 @@
 package webserver;
 
-import servletimpl.ServletInfo;
+import config.ServletManager;
 import servletimpl.ServletService;
 import util.Constants;
 import util.SendResponse;
@@ -88,9 +88,8 @@ public class ServerThread implements Runnable {
             output = new BufferedOutputStream(socket.getOutputStream());
 
             // Servletのサービスを実行する。(doGetとかdoPost)
-            ServletInfo servletInfo = ServletInfo.searchServlet(path);
-            if (servletInfo != null) {
-                ServletService.doService(method, query, servletInfo, requestHeader, input, output);
+            if (ServletManager.exists(path)) {
+                ServletService.doService(method, query, requestHeader, input, output, path);
                 return;
             }
             

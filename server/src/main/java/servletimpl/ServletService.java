@@ -1,5 +1,6 @@
 package servletimpl;
 
+import config.ServletManager;
 import servletinterfaces.HttpServlet;
 import servletinterfaces.HttpServletRequest;
 import servletinterfaces.HttpServletResponse;
@@ -14,17 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServletService {
-
-    /**
-     * @param info
-     * @return HttpServletインスタンス
-     * @throws Exception 引数に渡されたServletInfoのservletClassNameからHttpServletインスタンスを生成する。
-     */
-    private static HttpServlet createServlet(ServletInfo info) throws Exception {
-        Class<?> clazz = Class.forName(info.servletClassName);
-        return (HttpServlet) clazz.newInstance();
-    }
-
+    
     /**
      * @param query リクエストクエリの文字列
      * @return クエリの名前と値のMap
@@ -60,20 +51,15 @@ public class ServletService {
     /**
      * @param method        GET/POST
      * @param query         リクエストURLに含まれるクエリ
-     * @param info
      * @param requestHeader "Host: localhost:8001"などのリクエストヘッダーMap
      * @param input
      * @param output
+     * @param path
      * @throws Exception
      */
-    public static void doService(String method, String query, ServletInfo info, Map<String, String> requestHeader,
-                                 InputStream input, OutputStream output) throws Exception {
-
-        // サーブレットインスタンスが生成されてない場合に生成する。
-        if (info.servlet == null) {
-            info.servlet = createServlet(info);
-        }
-
+    public static void doService(String method, String query, Map<String, String> requestHeader,
+                                 InputStream input, OutputStream output, String path) throws Exception {
+        
         ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
         HttpServletResponseImpl resp = new HttpServletResponseImpl(outputBuffer);
 
@@ -95,7 +81,7 @@ public class ServletService {
         }
 
         // Servletのサービスを実行する。（doGet()やdoPost()）
-        info.servlet.service(req, resp);
+        ServletManager.getServlet(path).service(req, resp);
 
         // Servletのサービス側でリダイレクトを設定しているとstatusがSC_FOUNDになっているので、リダイレクトしてない場合がこっち。
         if (resp.status == HttpServletResponse.SC_OK) {
