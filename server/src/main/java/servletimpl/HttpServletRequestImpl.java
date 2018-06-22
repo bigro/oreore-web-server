@@ -109,9 +109,9 @@ public class HttpServletRequestImpl implements HttpServletRequest {
         this.response.addCookie(new Cookie(SESSION_COOKIE_ID, this.session.getId() + "; HttpOnly"));
     }
 
-    HttpServletRequestImpl(String method, Map<String, String> requestHeader,
-                           Map<String, String> parameterMap,
-                           HttpServletResponseImpl resp) {
+    public HttpServletRequestImpl(String method, Map<String, String> requestHeader,
+                                  Map<String, String> parameterMap,
+                                  HttpServletResponseImpl resp) {
         this.method = method;
         this.requestHeader = requestHeader;
         this.cookies = parseCookies(requestHeader.get("COOKIE"));
